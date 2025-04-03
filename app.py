@@ -11,20 +11,29 @@ st.title("Environmental Monitoring Dashboard")
 
 df = process_data(_DATA_PATH)
 
-st.subheader("Average Values")
-col1, col2 = st.columns(2)
-col1.metric("Average External Humidity (%)", f"{calculate_average_external_humidity(df):.2f}")
-col2.metric("Average External Temperature (°F)", f"{calculate_average_external_temperature(df):.2f}")
+selected_date = st.date_input("Select a date", value=df['timestamp'].dt.date.min())
+df_day = df[df['timestamp'].dt.date == selected_date]
 
-st.subheader("Time Series Graphs")
+
+col3, col4 = st.columns(2)
+col3.metric(
+    f"Avg Ext. Humidity ({selected_date})",
+    f"{df_day['external_humidity'].mean():.2f}" if not df_day.empty else "N/A"
+)
+col4.metric(
+    f"Avg Ext. Temp ({selected_date})",
+    f"{df_day['external_temperature'].mean():.2f}" if not df_day.empty else "N/A"
+)
+
+st.subheader("Time Series Charts")
 col1, col2 = st.columns(2)
 with col1:
-    st.plotly_chart(plot_interactive_line(df, 'box_1_drop_count', 'Drop Count - Box 1'), use_container_width=True)
+    st.plotly_chart(plot_interactive_line(df, 'box_1_drop_count', 'Drop Count – Box 1', selected_date), use_container_width=True)
 with col2:
-    st.plotly_chart(plot_interactive_line(df, 'box_2_drop_count', 'Drop Count - Box 2'), use_container_width=True)
+    st.plotly_chart(plot_interactive_line(df, 'box_2_drop_count', 'Drop Count – Box 2', selected_date), use_container_width=True)
 
 col3, col4 = st.columns(2)
 with col3:
-    st.plotly_chart(plot_interactive_line(df, 'external_humidity', 'External Humidity'), use_container_width=True)
+    st.plotly_chart(plot_interactive_line(df, 'external_humidity', 'External Humidity', selected_date), use_container_width=True)
 with col4:
-    st.plotly_chart(plot_interactive_line(df, 'external_temperature', 'External Temperature'), use_container_width=True)
+    st.plotly_chart(plot_interactive_line(df, 'external_temperature', 'External Temperature', selected_date), use_container_width=True)
