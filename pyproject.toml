@@ -1,0 +1,13 @@
+[project]
+name = "dashboard"
+version = "0.1.0"
+description = "Environmental monitoring dashboard"
+authors = [{ name = "Cyrus Buhariwall", email = "cyrus.buhariwall@gmail.com" }]
+dependencies = []
+
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools]
+packages = ["dashboard"]
