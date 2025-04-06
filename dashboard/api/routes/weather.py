@@ -1,10 +1,12 @@
+from datetime import datetime
+from typing import List, Optional
+
 from fastapi import APIRouter, Depends
 from pydantic import BaseModel
+from sqlalchemy.orm import Session
+
 from dashboard.database.db import SessionLocal
 from dashboard.database.models import Weather
-from sqlalchemy.orm import Session
-from datetime import datetime
-from typing import Optional, List
 
 router = APIRouter()
 
@@ -45,7 +47,7 @@ def _normalize_payload(data: dict) -> WeatherIn:
     mapped = {
         "timestamp": datetime.fromisoformat(f"{data['date']}T{data['time']}"),
         "temperature": data.get("Ext. DHT11 Temp (°F)"),
-        "humidity": data.get("Ext. Humidity (%)")
+        "humidity": data.get("Ext. Humidity (%)"),
     }
     payload = WeatherIn(**mapped)
     return payload

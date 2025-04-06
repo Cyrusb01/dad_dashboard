@@ -1,6 +1,7 @@
 import uuid
-from dashboard.database.models import Device
+
 from dashboard.database.db import SessionLocal, init_db
+from dashboard.database.models import Device
 
 
 def setup_test_device(device_name: str) -> uuid.UUID:
@@ -12,7 +13,7 @@ def setup_test_device(device_name: str) -> uuid.UUID:
         name=device_name,
         location="Test Bench",
         version_num="v1",
-        notes="Test device"
+        notes="Test device",
     )
     session.add(device)
     session.commit()

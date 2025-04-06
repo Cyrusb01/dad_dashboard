@@ -1,11 +1,13 @@
+from datetime import datetime
+from typing import List, Optional
+from uuid import UUID
+
 from fastapi import APIRouter, Depends
 from pydantic import BaseModel
-from dashboard.database.db import SessionLocal
-from dashboard.database.models import Measurement, Device
 from sqlalchemy.orm import Session
-from uuid import UUID
-from datetime import datetime
-from typing import Optional, List
+
+from dashboard.database.db import SessionLocal
+from dashboard.database.models import Device, Measurement
 
 router = APIRouter()
 
@@ -62,7 +64,7 @@ def _normalize_payload(data: dict, db: Session) -> MeasurementIn:
         "cold_humidity": data.get("Cold Humidity (%)"),
         "hot_temp": data.get("DHT11 Hot Temp (°F)"),
         "hot_humidity": data.get("Hot Humidity (%)"),
-        "drop_count": data.get("Drop Count")
+        "drop_count": data.get("Drop Count"),
     }
     payload = MeasurementIn(**mapped)
     return payload

@@ -1,5 +1,6 @@
-import pytest
 from datetime import datetime
+
+import pytest
 
 
 def test_upload_from_device(client):
@@ -11,17 +12,19 @@ def test_upload_from_device(client):
         "Cold Humidity (%)": 60.0,
         "DHT11 Hot Temp (°F)": 85.1,
         "Hot Humidity (%)": 50.0,
-        "Drop Count": 1234
+        "Drop Count": 1234,
     }
     response = client.post("/measurements/upload", json=payload)
     assert response.status_code == 200
     assert response.json().get("message") == "Measurement saved"
     assert "id" in response.json()
 
+
 def test_get_all_measurements(client):
     response = client.get("/measurements")
     assert response.status_code == 200
     assert isinstance(response.json(), list)
+
 
 def test_get_latest_measurement(client):
     response = client.get("/measurements/latest")

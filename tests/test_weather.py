@@ -6,7 +6,7 @@ def test_upload_weather(client):
         "date": datetime.now().date().isoformat(),
         "time": datetime.now().time().replace(microsecond=0).isoformat(),
         "Ext. DHT11 Temp (°F)": 70.5,
-        "Ext. Humidity (%)": 55.0
+        "Ext. Humidity (%)": 55.0,
     }
     response = client.post("/weather/upload", json=payload)
     assert response.status_code == 200

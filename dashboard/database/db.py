@@ -1,5 +1,6 @@
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
+
 from dashboard.database.models import Base
 
 DATABASE_URL = "sqlite:///./database.db"

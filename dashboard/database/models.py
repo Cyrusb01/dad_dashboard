@@ -1,9 +1,12 @@
-from sqlalchemy import Column, Float, Integer, String, Text, TIMESTAMP, ForeignKey, func
-from sqlalchemy.dialects.postgresql import UUID
-from sqlalchemy.ext.declarative import declarative_base
 import uuid
 
+from sqlalchemy import (TIMESTAMP, Column, Float, ForeignKey, Integer, String,
+                        Text, func)
+from sqlalchemy.dialects.postgresql import UUID
+from sqlalchemy.ext.declarative import declarative_base
+
 Base = declarative_base()
+
 
 class Device(Base):
     __tablename__ = "devices"
@@ -20,7 +23,9 @@ class Measurement(Base):
     __tablename__ = "measurements"
 
     measurement_id = Column(Integer, primary_key=True, autoincrement=True)
-    device_id = Column(UUID(as_uuid=True), ForeignKey("devices.device_id"), nullable=False)
+    device_id = Column(
+        UUID(as_uuid=True), ForeignKey("devices.device_id"), nullable=False
+    )
     timestamp = Column(TIMESTAMP, nullable=False)
     cold_temp = Column(Float)
     cold_humidity = Column(Float)
