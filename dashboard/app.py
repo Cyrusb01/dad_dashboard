@@ -39,6 +39,7 @@ df = get_all_data()
 selected_date = st.date_input("Select a date", value=df["timestamp"].dt.date.min())
 
 _plot_date_selector_and_metrics()
+_plot_drop_production_chart()
 
 
 

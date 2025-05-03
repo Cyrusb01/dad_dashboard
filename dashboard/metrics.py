@@ -20,25 +20,25 @@ def add_resampled_slopes(
     df: pd.DataFrame, interval: str = "20min"
 ) -> None:
     
-
-
-
     df.sort_values("timestamp", inplace=True)
-    df.set_index("timestamp", inplace=True)
 
-    col_name = f"drop_count"
-    slope_col = f"slope"
+    drop_count_col_name = f"drop_count"
+    slope_col_name = f"slope"
     resampled = (
     df.set_index(["device_id", "timestamp"])
-      .groupby(level="device_id")[col_name]
+      .groupby(level="device_id")[drop_count_col_name]
       .resample(interval, level="timestamp")
       .last()
       .dropna()
       .to_frame()
-)
-    resampled[slope_col] = np.gradient(resampled[col_name])
-    df[slope_col] = resampled[[slope_col]].reindex(df.index, method="ffill")[
-        slope_col
-    ]
+    )
 
-df.reset_index(inplace=True)
+    print(resampled)
+    breakpoint()
+    resampled[slope_col_name] = np.gradient(resampled[drop_count_col_name])
+    df[slope_col_name] = resampled[[slope_col_name]].reindex(df.index, method="bfill")[
+        slope_col_name
+    ]
+    print(df)
+
+    return df

@@ -21,6 +21,7 @@ def _fetch_measurements(session:Session) -> pd.DataFrame:
             for row in rows
         ]
     )
+    df["timestamp"] = pd.to_datetime(df["timestamp"])
     return df
 
 def _fetch_devices(session: Session) -> pd.DataFrame:
@@ -33,7 +34,6 @@ def _fetch_devices(session: Session) -> pd.DataFrame:
                 "location": row.location,
                 "version_num": row.version_num,
                 "notes": row.notes,
-                "drop_count": row.drop_count,
             }
             for row in rows
         ]
@@ -52,12 +52,18 @@ def _fetch_weather(session: Session)-> pd.DataFrame:
             for row in rows
         ]
     )
+    df["timestamp"] = pd.to_datetime(df["timestamp"])
     return df
 
-def get_all_data(session: Session)->pd.DataFrame:
-    measurements = _fetch_measurements(session)
-    weather = _fetch_weather(session)
-    devices = _fetch_devices(session)
-    measurements_and_weather = weather.join(measurements, on="timestamp", how="left")
-    measurements_weather_and_devices = measurements_and_weather.join(devices, on="device_id", how="left")
-    return measurements_weather_and_devices
+def get_all_data()->pd.DataFrame:
+    session = SessionLocal()
+    try:
+        measurements = _fetch_measurements(session)
+        weather = _fetch_weather(session)
+        devices = _fetch_devices(session)
+        breakpoint()
+        measurements_and_weather = pd.merge(weather, measurements, on="timestamp", how="left")
+        measurements_weather_and_devices = measurements_and_weather.join(devices, on="device_id", how="left")
+        return measurements_weather_and_devices
+    finally:
+        session.close()
