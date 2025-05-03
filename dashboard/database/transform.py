@@ -1,5 +1,6 @@
 import pandas as pd
 
+
 def compute_daily_drop_totals(df: pd.DataFrame) -> pd.DataFrame:
     df = df.copy()
     df["date"] = df["timestamp"].dt.date

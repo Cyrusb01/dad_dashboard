@@ -3,6 +3,9 @@ import pandas as pd
 
 _DROPS_IN_ML = 20
 
+_DROP_COUNT_COL_NAME = "drop_count"
+_SLOPE_COL_NAME = f"slope"
+
 
 def calculate_water_per_day(df: pd.DataFrame) -> None:
     df["date"] = df["timestamp"].dt.date
@@ -16,29 +19,34 @@ def calculate_water_per_day(df: pd.DataFrame) -> None:
     df["box_2_day_ml"] = df["box_2_day_total"] * (1 / _DROPS_IN_ML)
 
 
-def add_resampled_slopes(
-    df: pd.DataFrame, interval: str = "20min"
-) -> None:
-    
-    df.sort_values("timestamp", inplace=True)
+def add_resampled_slopes(df: pd.DataFrame, interval: str = "20min") -> pd.DataFrame:
+    df = df.copy()
+    df = df.sort_values("timestamp")
 
-    drop_count_col_name = f"drop_count"
-    slope_col_name = f"slope"
-    resampled = (
-    df.set_index(["device_id", "timestamp"])
-      .groupby(level="device_id")[drop_count_col_name]
-      .resample(interval, level="timestamp")
-      .last()
-      .dropna()
-      .to_frame()
+    # Create multiindex for resampling
+    grouped = (
+        df.set_index(["device_id", "timestamp"])
+        .groupby(level="device_id")[_DROP_COUNT_COL_NAME]
+        .resample(interval, level="timestamp")
+        .last()
+        .dropna()
+        .to_frame()
     )
 
-    print(resampled)
-    breakpoint()
-    resampled[slope_col_name] = np.gradient(resampled[drop_count_col_name])
-    df[slope_col_name] = resampled[[slope_col_name]].reindex(df.index, method="bfill")[
-        slope_col_name
-    ]
-    print(df)
+    # Compute slope per device
+    grouped[_SLOPE_COL_NAME] = grouped.groupby(level="device_id")[
+        _DROP_COUNT_COL_NAME
+    ].transform(np.gradient)
 
+    # Flatten back to standard index
+    grouped = grouped.reset_index()
+
+    # Merge slope back onto the original dataframe using nearest timestamp within device
+    df[_SLOPE_COL_NAME] = pd.merge_asof(
+        df.sort_values("timestamp"),
+        grouped.sort_values("timestamp"),
+        by="device_id",
+        on="timestamp",
+        direction="backward",
+    )[_SLOPE_COL_NAME]
     return df

@@ -11,7 +11,7 @@ _DEVICE_UUIDS = {
     "box_1": UUID("8597098d199646918b8491fa05ac514e"),
     "box_2": UUID("a65a939bdc784da28ee3908f2974386f"),
 }
-_CSV_PATH = Path("csv_data/data.csv")
+_CSV_PATH = Path("csv_data/data_2025-04-04.csv")
 _DEVICES = [
     Device(
         device_id=_DEVICE_UUIDS["box_1"],
@@ -37,15 +37,12 @@ def _select_new_data(session: Session, df: pd.DataFrame) -> pd.DataFrame:
     )
     if latest_time is None:
         latest_time = pd.Timestamp("1970-01-01")
-    df = df[df["timestamp"] > latest_time]
-    return df
+    new_data = df[df["timestamp"] > latest_time]
+    return new_data
 
 
 def _load_csv(session: Session, path: Path) -> pd.DataFrame:
     df = pd.read_csv(path)
-    df["timestamp"] = pd.to_datetime(df["Date"] + " " + df["Time"])
-    df = df.sort_values("timestamp")
-    df = df.drop(columns=["Date", "Time"])
     df.columns = (
         df.columns.str.strip()
         .str.lower()
@@ -54,6 +51,9 @@ def _load_csv(session: Session, path: Path) -> pd.DataFrame:
         .str.replace(")", "")
         .str.replace(".", "")
     )
+    df["timestamp"] = pd.to_datetime(df["date"] + " " + df["time"])
+    df = df.sort_values("timestamp")
+    df = df.drop(columns=["date", "time"])
     df_non_duplicates = _select_new_data(session, df)
     return df_non_duplicates
 
@@ -67,14 +67,14 @@ def _init_devices(session: Session):
 
 
 def insert_weather(session: Session, row: pd.Series):
-    if pd.notnull(row.get("external_temperature")) or pd.notnull(
-        row.get("external_humidity")
+    if pd.notnull(row.get("ext_dht11_temp_°f")) or pd.notnull(
+        row.get("ext_humidity_%")
     ):
         session.add(
             Weather(
                 timestamp=row["timestamp"],
-                temperature=row.get("external_temperature"),
-                humidity=row.get("external_humidity"),
+                temperature=row.get("ext_dht11_temp_°f"),
+                humidity=row.get("ext_humidity_%"),
             )
         )
 
@@ -99,7 +99,6 @@ def main():
     session = SessionLocal()
     df = _load_csv(session, _CSV_PATH)
     _init_devices(session)
-    breakpoint()
 
     for _, row in df.iterrows():
         insert_weather(session, row)

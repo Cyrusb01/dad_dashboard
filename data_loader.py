@@ -3,8 +3,7 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 
-from dashboard.metrics import (add_resampled_slopes,
-                               calculate_water_per_day)
+from dashboard.metrics import add_resampled_slopes, calculate_water_per_day
 
 
 def _canonicalize_columns(df: pd.DataFrame) -> pd.DataFrame:

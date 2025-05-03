@@ -1,7 +1,6 @@
 import uuid
 
-from sqlalchemy import (TIMESTAMP, Column, Float, ForeignKey, Integer, String,
-                        Text, func)
+from sqlalchemy import TIMESTAMP, Column, Float, ForeignKey, Integer, String, Text, func
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.ext.declarative import declarative_base
 
